@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Retro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        canvas {
+            background-color: black;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white text-center p-6">
+    <h1 class="text-3xl font-bold mb-4">Pac-Man Retro</h1>
+    <p>Usa las teclas de flecha para mover a Pac-Man. ¡Come todos los puntos y evita los fantasmas!</p>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <audio id="pacmanAudio" loop autoplay>
+        <source src="https://www.myinstants.com/media/sounds/pacman-intro.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const tileSize = 20;
+        let pacMan = { x: 1, y: 1, dir: 'right' };
+        let map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,1,0,0,0,2,1,0,0,0,0,1,0,0,0,1],
+            [1,0,1,1,0,1,0,1,1,0,1,0,1,1,0,1,0,1,0,1],
+            [1,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,1],
+            [1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1],
+            [1,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,1,0,1],
+            [1,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1,1,0,1],
+            [1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1],
+            [1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1,0,1],
+            [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < map.length; y++) {
+                for (let x = 0; x < map[y].length; x++) {
+                    if (map[y][x] === 1) {
+                        ctx.fillStyle = "blue";
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                    }
+                }
+            }
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(pacMan.x * tileSize + tileSize / 2, pacMan.y * tileSize + tileSize / 2, tileSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function movePacMan() {
+            let newX = pacMan.x;
+            let newY = pacMan.y;
+            if (pacMan.dir === 'up') newY--;
+            if (pacMan.dir === 'down') newY++;
+            if (pacMan.dir === 'left') newX--;
+            if (pacMan.dir === 'right') newX++;
+            if (map[newY] && map[newY][newX] === 0) {
+                pacMan.x = newX;
+                pacMan.y = newY;
+            }
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp") pacMan.dir = 'up';
+            if (event.key === "ArrowDown") pacMan.dir = 'down';
+            if (event.key === "ArrowLeft") pacMan.dir = 'left';
+            if (event.key === "ArrowRight") pacMan.dir = 'right';
+        });
+
+        function gameLoop() {
+            movePacMan();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
